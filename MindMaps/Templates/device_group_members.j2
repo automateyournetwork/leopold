@@ -1,0 +1,21 @@
+{%- for item in member %}
+# {{ item.name }}
+## Devices
+{%-     for device in item['device-name'] %}
+### {{ device }}
+{%-     endfor %}
+## Members
+{%-     for device in item['member'] %}
+### {{ device }}
+{%-     endfor %}
+## NED ID
+{%-     for device in item['ned-id'] %}
+### {{ device.id }}
+{%-     endfor %}
+## NCS Alarms
+### Indeterminates: {{ item['tailf-ncs-alarms:alarm-summary']['indeterminates'] }}
+### Criticals: {{ item['tailf-ncs-alarms:alarm-summary']['criticals'] }}
+### Majors: {{ item['tailf-ncs-alarms:alarm-summary']['majors'] }}
+### Minors: {{ item['tailf-ncs-alarms:alarm-summary']['minors'] }}
+### Warnings: {{ item['tailf-ncs-alarms:alarm-summary']['warnings'] }}
+{%- endfor %}

@@ -1,0 +1,136 @@
+{%- for device in device %}
+# {{ device.name }}
+## IP Address: {{ device.address }}
+## Device Type
+### Protocol {{ device['device-type'].cli.protocol}}
+### NED ID {{ device['device-type'].cli['ned-id']}}
+## SSH
+### Host Key Verification: {{ device.ssh['host-key-verification']}}
+## Auth Group: {{ device.authgroup }}
+## Commit Queue
+### Queue Length: {{ device['commit-queue']['queue-length']}}
+## Active Settings
+### Timeouts
+#### Connection: {{ device['active-settings']['connect-timeout']}}
+#### Read: {{ device['active-settings']['read-timeout']}}
+#### Write: {{ device['active-settings']['write-timeout']}}
+### Keep Alive
+#### SSH
+##### Interval: {{ device['active-settings']['ssh-keep-alive']['interval']}}
+##### Count: {{ device['active-settings']['ssh-keep-alive']['count']}}
+#### NED
+##### Count: {{ device['active-settings']['ned-keep-alive']['count']}}
+### Connection Retries
+#### Attempts: {{ device['active-settings']['connect-retries']['attempts']}}
+#### Timeout: {{ device['active-settings']['connect-retries']['timeout']}}
+### Trace
+#### Enabled: {{ device['active-settings']['trace'] }}
+#### Output: {{ device['active-settings']['trace-output'] }}
+### NED
+#### Use JunOS Rollback: {{ device['active-settings']['ned-settings']['use-junos-rollback'] }}
+### Commit Queue
+#### Enabled by Default: {{ device['active-settings']['commit-queue']['enabled-by-default'] }}
+### Session Pool
+#### Idle Time: {{ device['active-settings']['session-pool']['idle-time'] }}
+### No Overwrite
+#### Enabled by Default: {{ device['active-settings']['no-overwrite']['enabled-by-default'] }}
+### Link State Advertisement
+#### No Overwrite: {{ device['active-settings']['lsa']['no-overwrite']['enabled-by-default'] }}
+### Out of Sync Commit Behaviour: {{ device['active-settings']['out-of-sync-commit-behaviour'] }}
+## State
+### Operational: {{ device['state']['oper-state'] }}
+### Error: {{ device['state']['oper-state-error-tag'] }}
+### Admin: {{ device['state']['admin-state'] }}
+## Config
+{%-     for ietf in device['config'] %}
+### {{ ietf }}
+{%-         if ":yang-library" in ietf|string %}
+{%-             for module_set in device['config'][ietf]['module-set'] %}
+#### Module Set: {{ module_set.name }}
+{%-                 for module in module_set.module %}
+##### Module: {{ module.name }}
+###### Namespace: {{ module.namespace }}
+###### Revsion: {{ module.revision }}
+{%-                     for feature in module.feature %}
+###### Feature: {{ feature }}
+{%-                     endfor %}
+{%-                 endfor %}
+{%-                 for module in module_set['import-only-module'] %}
+##### Import Only Module: {{ module.name }}
+###### Namespace: {{ module.namespace }}
+###### Revsion: {{ module.revision }}
+{%-                 endfor %}
+{%-             endfor %}
+#### Schemas
+{%-             for schema in device['config'][ietf]['schema']%}
+##### {{ schema.name }}
+{%-                 for set in schema['module-set'] %}
+###### Module Set: {{ set }}
+{%-                 endfor %}
+{%-             endfor%}
+#### Datastores
+{%-             for store in device['config'][ietf]['datastore']%}
+##### {{ store.name }}
+###### Schema: {{ store.schema }}
+{%-             endfor%}
+#### Content ID: {{ device['config']['ietf-yang-library:yang-library']['content-id'] }}
+{%-         else %}
+#### Module Set ID:  {{ device['config']['ietf-yang-library:modules-state']['module-set-id'] }}
+{%-             for module_set in device['config'][ietf]['module'] %}
+##### {{ module_set.name }}
+###### Namespace: {{ module_set.namespace }}
+###### Revision: {{ module_set.revision }}
+###### Conformance Type: {{ module_set['conformance-type'] }}
+{%-                 for feature in module_set.feature %}
+###### Feature {{ feature }}
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+## Live Status
+{%-     for ietf in device['live-status'] %}
+### {{ ietf }}
+{%-         if ":yang-library" in ietf|string %}
+{%-             for module_set in device['live-status'][ietf]['module-set'] %}
+#### Module Set: {{ module_set.name }}
+{%-                 for module in module_set.module %}
+##### Module: {{ module.name }}
+###### Namespace: {{ module.namespace }}
+###### Revsion: {{ module.revision }}
+{%-                     for feature in module.feature %}
+###### Feature: {{ feature }}
+{%-                     endfor %}
+{%-                 endfor %}
+{%-                 for module in module_set['import-only-module'] %}
+##### Import Only Module: {{ module.name }}
+###### Namespace: {{ module.namespace }}
+###### Revsion: {{ module.revision }}
+{%-                 endfor %}
+{%-             endfor %}
+#### Schemas
+{%-             for schema in device['live-status'][ietf]['schema']%}
+##### {{ schema.name }}
+{%-                 for set in schema['module-set'] %}
+###### Module Set: {{ set }}
+{%-                 endfor %}
+{%-             endfor%}
+#### Datastores
+{%-             for store in device['live-status'][ietf]['datastore']%}
+##### {{ store.name }}
+###### Schema: {{ store.schema }}
+{%-             endfor%}
+#### Content ID: {{ device['live-status']['ietf-yang-library:yang-library']['content-id'] }}
+{%-         else %}
+#### Module Set ID:  {{ device['live-status']['ietf-yang-library:modules-state']['module-set-id'] }}
+{%-             for module_set in device['live-status'][ietf]['module'] %}
+##### {{ module_set.name }}
+###### Namespace: {{ module_set.namespace }}
+###### Revision: {{ module_set.revision }}
+###### Conformance Type: {{ module_set['conformance-type'] }}
+{%-                 for feature in module_set.feature %}
+###### Feature {{ feature }}
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+{%- endfor %}
