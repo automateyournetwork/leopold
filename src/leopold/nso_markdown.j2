@@ -1,0 +1,123 @@
+{%- if api == "/restconf/data/tailf-ncs:devices/device-group" %}# Device Groups
+| Group Name | Member | NED ID | Alarms Critical | Alarms Indeterminate | Alarms Major | Alarms Minor | Alarms Warning |
+| ---------- | ------ | ------ | --------------- | -------------------- | ------------ | ------------ | -------------- |
+{%-     for group in data_to_template['tailf-ncs:device-group'] %}
+{%-         for ned in group['ned-id'] %}
+| {{ group.name }} | {{ group.member }} | {{ ned.id }} | {{ group['tailf-ncs-alarms:alarm-summary'].criticals }} | {{ group['tailf-ncs-alarms:alarm-summary'].indeterminates }} | {{ group['tailf-ncs-alarms:alarm-summary'].majors }} | {{ group['tailf-ncs-alarms:alarm-summary'].minors }} | {{ group['tailf-ncs-alarms:alarm-summary'].warnings }} |
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "/restconf/data/tailf-ncs:devices/device" %}# Devices
+| Name | Address | Auth Group | Platform Model | Platform Name | Platform Serial Number | Platform Version | Commit Queue Enabled By Default | Connect Retries Attempts | Connect Retries Timeout | Connect Timeout | LSA No Overwrite Enabled By Default | NED Keep Alive Count | NED Settings Use JunOS Rollback | No Overwrite Enabled By Default | Out Of Sync Commit Behaviour | Read Timeout | Session Pool Idle Time | SSH Keep Alive Count | SSH Keep Alive Interval | Trace | Trace Output | Write Timeout | Commit Queue Queue Length | Device Type CLI NED ID | Device Type CLI Protocol | SSH Host Key Verification | Admin State | Last Transaction ID | Oper State | Oper State Error Tag | Transaction Mode | Alarms Criticals | Alarms Indeterminates | Alarms Majors | Alarms Minors | Alarms Warnings |
+| ---- | ------- | ---------- | -------------- | ------------- | ---------------------- | ---------------- | ------------------------------- | ------------------------ | ----------------------- | --------------- | ----------------------------------- | -------------------- | ------------------------------- | ------------------------------- | ---------------------------- | ------------ | ---------------------- | -------------------- | ----------------------- | ----- | ------------ | ------------- | ------------------------- | ---------------------- | ------------------------ | ------------------------- | ----------- | ------------------- | ---------- | -------------------- | ---------------- | ---------------- | --------------------- | ------------- | ------------- | --------------- |
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+| {{ device.name }} | {{ device.address }} | {{ device.authgroup }} | {%- if device.platform %}{{ device.platform.model }} | {{ device.platform.name }} | {{ device.platform['serial-number'] }} | {{ device.platform.version }} | {%- else %}N/A | N/A | N/A | N/A | {%- endif %}{{ device['active-settings']['commit-queue']['enabled-by-default'] }} | {{ device['active-settings']['connect-retries'].attempts }} | {{ device['active-settings']['connect-retries'].timeout }} | {{ device['active-settings']['connect-timeout'] }} | {{ device['active-settings'].lsa['no-overwrite']['enabled-by-default'] }} | {{ device['active-settings']['ned-keep-alive'].count }} | {{ device['active-settings']['ned-settings']['use-junos-rollback'] }} | {{ device['active-settings']['no-overwrite']['enabled-by-default'] }} | {{ device['active-settings']['out-of-sync-commit-behaviour'] }} | {{ device['active-settings']['read-timeout'] }} | {{ device['active-settings']['session-pool']['idle-time'] }} | {{ device['active-settings']['ssh-keep-alive'].count }} | {{ device['active-settings']['ssh-keep-alive'].interval }} | {{ device['active-settings'].trace }} | {{ device['active-settings']['trace-output'] }} | {{ device['active-settings']['write-timeout'] }} | {{ device['commit-queue']['queue-length'] }} | {{ device['device-type'].cli['ned-id'] }} | {{ device['device-type'].cli.protocol }} | {{ device.ssh['host-key-verification'] }} | {{ device.state['admin-state'] }} | {{ device.state['last-transaction-id'] | default("N/A") }} | {{ device.state['oper-state'] }} | {{ device.state['oper-state-error-tag'] }} | {{ device.state['transaction-mode'] | default("N/A") }} | {%- if device['tailf-ncs-alarms:alarm-summary'] %}{{ device['tailf-ncs-alarms:alarm-summary'].criticals }} | {{ device['tailf-ncs-alarms:alarm-summary'].indeterminates }} | {{ device['tailf-ncs-alarms:alarm-summary'].majors }} | {{ device['tailf-ncs-alarms:alarm-summary'].minors }} | {{ device['tailf-ncs-alarms:alarm-summary'].warnings }}{%- else %}N/A | N/A | N/A | N/A | N/A{%- endif %} |
+{%-     endfor %}
+{%- elif api == "config_yang_module_state" %}# Device Config YANG Module State
+| Device Name | Module Set ID | Module Name | Module Namespace | Module Revision | Module Conformance Type | Module Feature |
+| ----------- | ------------- | ----------- | ---------------- | --------------- | ----------------------- | -------------- |
+{%-     for hit in data_to_template %}
+{%-         for module in hit.module %}
+{%-             if module.feature %}
+{%-                 for feature in module.feature %}
+| {{ hit.device_name }} | {{ hit['module-set-id'] }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ module['conformance-type'] }} | {{ feature }} |
+{%-                 endfor %}
+{%-             else %}
+| {{ hit.device_name }} | {{ hit['module-set-id'] }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ module['conformance-type'] }} | N/A |
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_datastore" %}# Device Config YANG Library Datastores
+| Device Name | Content ID | Data Store Name | Data Store Schema |
+| ----------- | ---------- | --------------- | ----------------- |
+{%-     for hit in data_to_template %}
+{%-         for store in hit.datastore %}
+| {{ hit.device_name }} | {{ hit['content-id'] }} | {{ store.name }} | {{ store.schema }} |
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_module_set_import_only" %}# Device Config YANG Module Set Import Only
+| Device Name | Module Set Name | Name | Namespace | Revision |
+| ----------- | --------------- | ---- | --------- | -------- |
+{%-     for hit in data_to_template %}
+{%-         for module in hit['module-set'] %}
+{%-             for import_only in module['import-only-module'] %}
+| {{ hit.device_name }} | {{ module.name }} | {{ import_only.name }} | {{ import_only.namespace }} | {{ import_only.revision }} |
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_module_set_module" %}# Device Config YANG Module Set Modules
+| Device Name | Module Set Name | Module Name | Module Namespace | Module Revision | Module Feature |
+| ----------- | --------------- | ----------- | ---------------- | --------------- | -------------- |
+{%-     for hit in data_to_template %}
+{%-         for module_set in hit['module-set'] %}
+{%-             for module in module_set.module %}
+{%-                 for feature in module.feature %}
+| {{ hit.device_name }} | {{ module_set.name }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ feature }} |
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+{%- elif api == "config_yang_library_schema" %}# Device Config YANG Library Schemas
+| Device Name | Schema Name | Module Set |
+| ----------- | ----------- | ---------- |
+{%-     for hit in data_to_template %}
+{%-         for schema in hit.schema %}
+{%-             for module_set in schema['module-set'] %}
+| {{ hit.device_name }} | {{ schema.name }} | {{ module_set }} |
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_module_state" %}# Device Live Status YANG Module State
+| Device Name | Module Set ID | Module Name | Module Namespace | Module Revision | Module Conformance Type | Module Feature |
+| ----------- | ------------- | ----------- | ---------------- | --------------- | ----------------------- | -------------- |
+{%-     for hit in data_to_template %}
+{%-         for module in hit.module %}
+{%-             if module.feature %}
+{%-                 for feature in module.feature %}
+| {{ hit.device_name }} | {{ hit['module-set-id'] }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ module['conformance-type'] }} | {{ feature }} |
+{%-                 endfor %}
+{%-             else %}
+| {{ hit.device_name }} | {{ hit['module-set-id'] }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ module['conformance-type'] }} | N/A |
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_datastore" %}# Device Live Status YANG Library Datastores
+| Device Name | Content ID | Data Store Name | Data Store Schema |
+| ----------- | ---------- | --------------- | ----------------- |
+{%-     for hit in data_to_template %}
+{%-         for store in hit.datastore %}
+| {{ hit.device_name }} | {{ hit['content-id'] }} | {{ store.name }} | {{ store.schema }} |
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_module_set_import_only" %}# Device Live Status YANG Module Set Import Only
+| Device Name | Module Set Name | Name | Namespace | Revision |
+| ----------- | --------------- | ---- | --------- | -------- |
+{%-     for hit in data_to_template %}
+{%-         for module in hit['module-set'] %}
+{%-             for import_only in module['import-only-module'] %}
+| {{ hit.device_name }} | {{ module.name }} | {{ import_only.name }} | {{ import_only.namespace }} | {{ import_only.revision }} |
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_module_set_module" %}# Device Live Status YANG Module Set Modules
+| Device Name | Module Set Name | Module Name | Module Namespace | Module Revision | Module Feature |
+| ----------- | --------------- | ----------- | ---------------- | --------------- | -------------- |
+{%-     for hit in data_to_template %}
+{%-         for module_set in hit['module-set'] %}
+{%-             for module in module_set.module %}
+{%-                 for feature in module.feature %}
+| {{ hit.device_name }} | {{ module_set.name }} | {{ module.name }} | {{ module.namespace }} | {{ module.revision }} | {{ feature }} |
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+{%- elif api == "live_status_yang_library_schema" %}# Device Live Status YANG Library Schemas
+| Device Name | Schema Name | Module Set |
+| ----------- | ----------- | ---------- |
+{%-     for hit in data_to_template %}
+{%-         for schema in hit.schema %}
+{%-             for module_set in schema['module-set'] %}
+| {{ hit.device_name }} | {{ schema.name }} | {{ module_set }} |
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- endif %}

@@ -1,0 +1,216 @@
+{%- if api == "/restconf/data/tailf-ncs:devices/device-group" %}
+# Device Groups
+{%-     for group in data_to_template['tailf-ncs:device-group'] %}
+## Name: {{ group.name }}
+### Members
+{%-         for member in group.member %}
+#### {{ member }}
+{%-         endfor %}
+### Alarms
+#### Criticals: {{ group['tailf-ncs-alarms:alarm-summary'].criticals }}
+#### Indeterminates: {{ group['tailf-ncs-alarms:alarm-summary'].indeterminates }}
+#### Majors: {{ group['tailf-ncs-alarms:alarm-summary'].majors }}
+#### Minors: {{ group['tailf-ncs-alarms:alarm-summary'].minors }}
+#### Warnings: {{ group['tailf-ncs-alarms:alarm-summary'].warnings }}
+### NEDs
+{%-         for ned in group['ned-id'] %}
+#### ID: {{ ned.id }}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "/restconf/data/tailf-ncs:devices/device" %}
+# Devices
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+## Name: {{ device.name }}
+### Address: {{ device.address }}
+### Auth Group: {{ device.authgroup }}
+{%-         if device.platform %}
+### Platform
+#### Model: {{ device.platform.model }}
+#### Name: {{ device.platform.name }}
+#### Serial Number: {{ device.platform['serial-number'] }}
+#### Version: {{ device.platform.version }}
+{%-         endif %}
+### Commit Queue Enabled By Default: {{ device['active-settings']['commit-queue']['enabled-by-default'] }}
+### Connect Retries
+#### Attempts: {{ device['active-settings']['connect-retries'].attempts }}
+#### Timeout: {{ device['active-settings']['connect-retries'].timeout }}
+### Connect Timeout: {{ device['active-settings']['connect-timeout'] }}
+### Active Settings
+#### LSA No Overwrite Enabled By Default: {{ device['active-settings'].lsa['no-overwrite']['enabled-by-default'] }}
+#### NED Keep Alive Count: {{ device['active-settings']['ned-keep-alive'].count }}
+#### NED Settings Use JunOS Rollback: {{ device['active-settings']['ned-settings']['use-junos-rollback'] }}
+#### No Overwrite Enabled By Default: {{ device['active-settings']['no-overwrite']['enabled-by-default'] }}
+#### Out of Sync Commit Behaviour: {{ device['active-settings']['out-of-sync-commit-behaviour'] }}
+#### Read Timeout: {{ device['active-settings']['read-timeout'] }}
+#### Session Pool: {{ device['active-settings']['session-pool']['idle-time'] }}
+#### SSH Keep Alive
+##### Count: {{ device['active-settings']['ssh-keep-alive'].count }}
+##### Interval: {{ device['active-settings']['ssh-keep-alive'].interval }}
+#### Trace: {{ device['active-settings'].trace }}
+#### Trace Output: {{ device['active-settings']['trace-output'] }}
+#### Write Timeout: {{ device['active-settings']['write-timeout'] }}
+### Commit Queue Queue Length: {{ device['commit-queue']['queue-length'] }}
+### CLI
+#### NED ID: {{ device['device-type'].cli['ned-id'] }}
+#### Protocol: {{ device['device-type'].cli.protocol }}
+### Host Key Verification: {{ device.ssh['host-key-verification'] }}
+### State
+#### Admin: {{ device.state['admin-state'] }}
+#### Last Transaction ID: {{ device.state['last-transaction-id'] | default("N/A") }}
+#### Oper: {{ device.state['oper-state'] }}
+#### Oper Error Tag: {{ device.state['oper-state-error-tag'] }}
+#### Transaction Mode: {{ device.state['transaction-mode'] | default("N/A") }}
+{%-         if device['tailf-ncs-alarms:alarm-summary'] %}
+### Alarm Summary
+#### Criticals: {{ device['tailf-ncs-alarms:alarm-summary'].criticals }}
+#### Indeterminates: {{ device['tailf-ncs-alarms:alarm-summary'].indeterminates }}
+#### Majors: {{ device['tailf-ncs-alarms:alarm-summary'].majors }}
+#### Minors: {{ device['tailf-ncs-alarms:alarm-summary'].minors }}
+#### Warnings: {{ device['tailf-ncs-alarms:alarm-summary'].warnings }}
+{%-         endif %}
+{%-     endfor %}
+{%- elif api == "config_yang_module_state" %}
+# Device Config YANG Module State
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Module Set ID: {{ hit['module-set-id'] }}
+{%-         for module in hit.module %}
+#### Name: {{ module.name }}
+##### Namespace {{ module.namespace }}
+##### Revision: {{ module.revision }}
+##### Conformance Type: {{ module['conformance-type'] }}
+{%-             if module.feature %}
+##### Feature
+{%-                 for feature in module.feature %}
+###### {{ feature }}
+{%-                 endfor %}
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_datastore" %}
+# Device Config YANG Library Datastore
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Content ID: {{ hit['content-id'] }}
+### Data Store
+{%-         for store in hit.datastore %}
+#### Name: {{ store.name }}
+#### Schema: {{ store.schema }}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_module_set_import_only" %}
+# Device Config YANG Library Module Set Import Only
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for module in hit['module-set'] %}
+### Module Name: {{ module.name }}
+### Import Only Modules
+{%-             for import_only in module['import-only-module'] %}
+#### Name: {{ import_only.name }}
+##### Namespace: {{ import_only.namespace }}
+##### Revision: {{ import_only.revision }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "config_yang_library_module_set_module" %}
+# Device Config YANG Library Module Set Modules
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for module_set in hit['module-set'] %}
+### Module Set: {{ module_set.name }}
+{%-             for module in module_set.module %}
+#### Module Name: {{ module.name }}
+##### Namespace: {{ module.namespace }}
+##### Revision: {{ module.revision }}
+##### Features
+{%-                 for feature in module.feature %}
+###### Feature: {{ feature }}
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+{%- elif api == "config_yang_library_schema" %}
+# Device Config YANG Library Schemas
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for schema in hit.schema %}
+### Schema Name: {{ schema.name }}
+#### Module Set
+{%-             for module_set in schema['module-set'] %}
+##### {{ module_set }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_module_state" %}
+# Device Live Status YANG Module State
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Module Set ID: {{ hit['module-set-id'] }}
+{%-         for module in hit.module %}
+#### Name: {{ module.name }}
+##### Namespace {{ module.namespace }}
+##### Revision: {{ module.revision }}
+##### Conformance Type: {{ module['conformance-type'] }}
+{%-             if module.feature %}
+##### Feature
+{%-                 for feature in module.feature %}
+###### {{ feature }}
+{%-                 endfor %}
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_datastore" %}
+# Device Live Status YANG Library Datastore
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Content ID: {{ hit['content-id'] }}
+### Data Store
+{%-         for store in hit.datastore %}
+#### Name: {{ store.name }}
+#### Schema: {{ store.schema }}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_module_set_import_only" %}
+# Device Live Status YANG Library Module Set Import Only
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for module in hit['module-set'] %}
+### Module Name: {{ module.name }}
+### Import Only Modules
+{%-             for import_only in module['import-only-module'] %}
+#### Name: {{ import_only.name }}
+##### Namespace: {{ import_only.namespace }}
+##### Revision: {{ import_only.revision }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "live_status_yang_library_module_set_module" %}
+# Device Live Status YANG Library Module Set Modules
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for module_set in hit['module-set'] %}
+### Module Set: {{ module_set.name }}
+{%-             for module in module_set.module %}
+#### Module Name: {{ module.name }}
+##### Namespace: {{ module.namespace }}
+##### Revision: {{ module.revision }}
+##### Features
+{%-                 for feature in module.feature %}
+###### Feature: {{ feature }}
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+{%- elif api == "live_status_yang_library_schema" %}
+# Device Live Status YANG Library Schemas
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for schema in hit.schema %}
+### Schema Name: {{ schema.name }}
+#### Module Set
+{%-             for module_set in schema['module-set'] %}
+##### {{ module_set }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- endif %}
