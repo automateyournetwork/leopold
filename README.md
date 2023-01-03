@@ -6,7 +6,16 @@ Business Ready Documents for Cisco Network Services Orchestrator
 
 Device Groups
 
-Devices 
+Devices
+
+Devices Config YANG Libary
+
+Devices Config YANG Modules State
+
+Devices Live Status YANG Library
+
+Devices Live Status Modules State
+
 ## Installation
 
 ```console
