@@ -1,0 +1,440 @@
+{%- include 'datatable_header.j2' %}
+{%- if api == "/restconf/data/tailf-ncs:devices/device-group" %}
+<h1>Device Groups</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Group Name</th>
+    <th>Member</th>
+    <th>NED ID</th>
+    <th>Alarms Critical</th>
+    <th>Alarms Indeterminate</th>
+    <th>Alarms Major</th>
+    <th>Alarms Minor</th>
+    <th>Alarms Warning</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for group in data_to_template['tailf-ncs:device-group'] %}
+{%-         for ned in group['ned-id'] %}
+  <tr>
+    <td>{{ group.name }}</td>
+    <td>{{ group.member }}</td>
+    <td>{{ ned.id }}</td>
+    <td>{{ group['tailf-ncs-alarms:alarm-summary'].criticals }}</td>
+    <td>{{ group['tailf-ncs-alarms:alarm-summary'].indeterminates }}</td>
+    <td>{{ group['tailf-ncs-alarms:alarm-summary'].majors }}</td>
+    <td>{{ group['tailf-ncs-alarms:alarm-summary'].minors }}</td>
+    <td>{{ group['tailf-ncs-alarms:alarm-summary'].warnings }}</td>
+  </tr>
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "/restconf/data/tailf-ncs:devices/device" %}
+<h1>Devices</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>Address</th>
+    <th>Auth Group</th>
+    <th>Platform Model</th>
+    <th>Platform Name</th>
+    <th>Platform Serial Number</th>
+    <th>Platform Version</th>
+    <th>Commit Queue Enabled By Default</th>
+    <th>Connect Retries Attempts</th>
+    <th>Connect Retries Timeout</th>
+    <th>Connect Timeout</th>
+    <th>LSA No Overwrite Enabled By Default</th>
+    <th>NED Keep Alive Count</th>
+    <th>NED Settings Use JunOS Rollback</th>
+    <th>No Overwrite Enabled By Default</th>
+    <th>Out Of Sync Commit Behaviour</th>
+    <th>Read Timeout</th>
+    <th>Session Pool Idle Time</th>
+    <th>SSH Keep Alive Count</th>
+    <th>SSH Keep Alive Interval</th>
+    <th>Trace</th>
+    <th>Trace Output</th>
+    <th>Write Timeout</th>
+    <th>Commit Queue Queue Length</th>
+    <th>Device Type CLI NED ID</th>
+    <th>Device Type CLI Protocol</th>
+    <th>SSH Host Key Verification</th>
+    <th>Admin State</th>
+    <th>Last Transaction ID</th>
+    <th>Oper State</th>
+    <th>Oper State Error Tag</th>
+    <th>Transaction Mode</th>
+    <th>Alarms Criticals</th>
+    <th>Alarms Indeterminates</th>
+    <th>Alarms Majors</th>
+    <th>Alarms Minors</th>
+    <th>Alarms Warnings</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+  <tr>
+    <td>{{ device.name }}</td>
+    <td>{{ device.address }}</td>
+    <td>{{ device.authgroup }}</td>
+    {%- if device.platform %}
+    <td>{{ device.platform.model }}</td>
+    <td>{{ device.platform.name }}</td>
+    <td>{{ device.platform['serial-number'] }}</td>
+    <td>{{ device.platform.version }}</td>
+    {%- else %}
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    {%- endif %}
+    <td>{{ device['active-settings']['commit-queue']['enabled-by-default'] }}</td>
+    <td>{{ device['active-settings']['connect-retries'].attempts }}</td>
+    <td>{{ device['active-settings']['connect-retries'].timeout }}</td>
+    <td>{{ device['active-settings']['connect-timeout'] }}</td>
+    <td>{{ device['active-settings'].lsa['no-overwrite']['enabled-by-default'] }}</td>
+    <td>{{ device['active-settings']['ned-keep-alive'].count }}</td>
+    <td>{{ device['active-settings']['ned-settings']['use-junos-rollback'] }}</td>
+    <td>{{ device['active-settings']['no-overwrite']['enabled-by-default'] }}</td>
+    <td>{{ device['active-settings']['out-of-sync-commit-behaviour'] }}</td>
+    <td>{{ device['active-settings']['read-timeout'] }}</td>
+    <td>{{ device['active-settings']['session-pool']['idle-time'] }}</td>
+    <td>{{ device['active-settings']['ssh-keep-alive'].count }}</td>
+    <td>{{ device['active-settings']['ssh-keep-alive'].interval }}</td>
+    <td>{{ device['active-settings'].trace }}</td>
+    <td>{{ device['active-settings']['trace-output'] }}</td>
+    <td>{{ device['active-settings']['write-timeout'] }}</td>
+    <td>{{ device['commit-queue']['queue-length'] }}</td>
+    <td>{{ device['device-type'].cli['ned-id'] }}</td>
+    <td>{{ device['device-type'].cli.protocol }}</td>
+    <td>{{ device.ssh['host-key-verification'] }}</td>
+    <td>{{ device.state['admin-state'] }}</td>
+    <td>{{ device.state['last-transaction-id'] | default("N/A") }}</td>
+    <td>{{ device.state['oper-state'] }}</td>
+    <td>{{ device.state['oper-state-error-tag'] }}</td>
+    <td>{{ device.state['transaction-mode'] | default("N/A") }}</td>
+    {%- if device['tailf-ncs-alarms:alarm-summary'] %}
+    <td>{{ device['tailf-ncs-alarms:alarm-summary'].criticals }}</td>
+    <td>{{ device['tailf-ncs-alarms:alarm-summary'].indeterminates }}</td>
+    <td>{{ device['tailf-ncs-alarms:alarm-summary'].majors }}</td>
+    <td>{{ device['tailf-ncs-alarms:alarm-summary'].minors }}</td>
+    <td>{{ device['tailf-ncs-alarms:alarm-summary'].warnings }}{%- else %}
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>{%- endif %}
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "config_yang_module_state" %}
+<h1>Device Config YANG Module State</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set ID</th>
+    <th>Module Name</th>
+    <th>Module Namespace</th>
+    <th>Module Revision</th>
+    <th>Module Conformance Type</th>
+    <th>Module Feature</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module in hit.module %}
+{%-             if module.feature %}
+{%-                 for feature in module.feature %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['module-set-id'] }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ module['conformance-type'] }}</td>
+    <td>{{ feature }}</td>
+  </tr>
+{%-                 endfor %}
+{%-             else %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['module-set-id'] }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ module['conformance-type'] }}</td>
+    <td>N/A</td>
+  </tr>
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "config_yang_library_datastore" %}
+<h1>Device Config YANG Library Datastore</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Content ID</th>
+    <th>Data Store Name</th>
+    <th>Data Store Schema</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for store in hit.datastore %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['content-id'] }}</td>
+    <td>{{ store.name }}</td>
+    <td>{{ store.schema }}</td>
+  </tr>
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "config_yang_library_module_set_import_only" %}
+<h1>Device Config YANG Library Module Set Import Only</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set Name</th>
+    <th>Name</th>
+    <th>Namespace</th>
+    <th>Revision</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module in hit['module-set'] %}
+{%-             for import_only in module['import-only-module'] %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ import_only.name }}</td>
+    <td>{{ import_only.namespace }}</td>
+    <td>{{ import_only.revision }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "config_yang_library_module_set_module" %}
+<h1>Device Config YANG Library Module Set Modules</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set Name</th>
+    <th>Module Name</th>
+    <th>Module Namespace</th>
+    <th>Module Revision</th>
+    <th>Module Feature</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module_set in hit['module-set'] %}
+{%-             for module in module_set.module %}
+{%-                 for feature in module.feature %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ module_set.name }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ feature }}</td>
+  </tr>
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+</tbody>
+</table>
+{%- elif api == "config_yang_library_schema" %}
+<h1>Device Config YANG Library Schemas</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Schema Name</th>
+    <th>Module Set</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for schema in hit.schema %}
+{%-             for module_set in schema['module-set'] %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ schema.name }}</td>
+    <td>{{ module_set }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "live_status_yang_module_state" %}
+<h1>Device Live Status YANG Module State</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set ID</th>
+    <th>Module Name</th>
+    <th>Module Namespace</th>
+    <th>Module Revision</th>
+    <th>Module Conformance Type</th>
+    <th>Module Feature</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module in hit.module %}
+{%-             if module.feature %}
+{%-                 for feature in module.feature %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['module-set-id'] }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ module['conformance-type'] }}</td>
+    <td>{{ feature }}</td>
+  </tr>
+{%-                 endfor %}
+{%-             else %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['module-set-id'] }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ module['conformance-type'] }}</td>
+    <td>N/A</td>
+  </tr>
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "live_status_yang_library_datastore" %}
+<h1>Device Live Status YANG Library Datastore</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Content ID</th>
+    <th>Data Store Name</th>
+    <th>Data Store Schema</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for store in hit.datastore %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['content-id'] }}</td>
+    <td>{{ store.name }}</td>
+    <td>{{ store.schema }}</td>
+  </tr>
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "live_status_yang_library_module_set_import_only" %}
+<h1>Device Live Status YANG Library Module Set Import Only</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set Name</th>
+    <th>Name</th>
+    <th>Namespace</th>
+    <th>Revision</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module in hit['module-set'] %}
+{%-             for import_only in module['import-only-module'] %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ import_only.name }}</td>
+    <td>{{ import_only.namespace }}</td>
+    <td>{{ import_only.revision }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "live_status_yang_library_module_set_module" %}
+<h1>Device Live Status YANG Library Module Set Modules</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Set Name</th>
+    <th>Module Name</th>
+    <th>Module Namespace</th>
+    <th>Module Revision</th>
+    <th>Module Feature</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for module_set in hit['module-set'] %}
+{%-             for module in module_set.module %}
+{%-                 for feature in module.feature %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ module_set.name }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.namespace }}</td>
+    <td>{{ module.revision }}</td>
+    <td>{{ feature }}</td>
+  </tr>
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-    endfor %}
+</tbody>
+</table>
+{%- elif api == "live_status_yang_library_schema" %}
+<h1>Device Live Status YANG Library Schemas</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Schema Name</th>
+    <th>Module Set</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for schema in hit.schema %}
+{%-             for module_set in schema['module-set'] %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ schema.name }}</td>
+    <td>{{ module_set }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- endif %}
+{%- include 'datatable_footer.j2' %}
