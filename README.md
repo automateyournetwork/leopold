@@ -8,13 +8,30 @@ Device Groups
 
 Devices
 
-Devices Config YANG Libary
+Devices Config Cisco IOS Call Home
+
+Devices Config Cisco IOS Crypto PKI
+
+Devices Config Cisco IOS Diagnostic
+
+Devices Config Cisco IOS Enable Password
+
+Devices Config Cisco IOS Hostname
+
+Devices Config Cisco IOS Interface
+
+Devices Config Cisco IOS IP
+
+Devices Config Cisco IOS Line
 
 Devices Config YANG Modules State
 
+Devices Config YANG Library
+
+Devices Live Status YANG Modules State
+
 Devices Live Status YANG Library
 
-Devices Live Status Modules State
 
 ## Installation
 
