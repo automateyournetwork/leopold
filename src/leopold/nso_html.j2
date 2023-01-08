@@ -436,5 +436,387 @@
 {%-     endfor %}
 </tbody>
 </table>
+{%- elif api == "device_capability" %}
+<h1>Device Capabilities</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module</th>
+    <th>Revision</th>
+    <th>URI</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['capability']%}
+{%-             for capability in device['capability'] %}
+  <tr>
+    <td>{{ device.name }}</td>
+    <td>{{ capability.module | default("N/A") }}</td>
+    <td>{{ capability.revision | default("N/A") }}</td>
+    <td>{{ capability.uri }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "device_module" %}
+<h1>Device Modules</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Module Name</th>
+    <th>Revision</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['module']%}
+{%-             for module in device['module'] %}
+  <tr>
+    <td>{{ device.name }}</td>
+    <td>{{ module.name }}</td>
+    <td>{{ module.revision }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_call_home" %}
+<h1>Device Cisco IOS Call Home</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Contact Email Address</th>
+    <th>Profile Name</th>
+    <th>Active</th>
+    <th>Transport Method Email</th>
+    <th>Transport Method HTTP</th>
+    <th>Smart Licensing Data</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for profile in hit.profile %}
+{%-             for http in profile.destination['transport-method'].http %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['contact-email-addr'] }}</td>
+    <td>{{ profile.name }}</td>
+    <td>{{ profile.active }}</td>
+    <td>{{ profile.destination['transport-method'].email }}</td>
+    <td>{{ http }}</td>
+    <td>{{ profile.reporting['smart-licensing-data'] }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_crypto_pki_certificates" %}
+<h1>Device Cisco IOS Crypto PKI Certificates</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Certificate Name</th>
+    <th>Certificate</th>
+    <th>Certificate Type</th>
+    <th>Certificate Serial</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for chain in hit.pki.certificate.chain %}
+{%-             for cert in chain.certificate %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ chain.name }}</td>
+    <td>{{ cert.cert }}</td>
+    <td>{{ cert['cert-type'] }}</td>
+    <td>{{ cert.serial }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_diagnostic" %}
+<h1>Device Cisco IOS Diagnostic</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Bootup Level</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit.bootup.level }}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_enable_password" %}
+<h1>Device Cisco IOS Enable Password Secret</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Password Secret</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit.password.secret }}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_hostname" %}
+<h1>Device Cisco IOS Hostname</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Hostname</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hostname in data_to_template %}
+  <tr>
+    <td>{{ hostname }}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_interface" %}
+<h1>Device Cisco IOS Interface</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Type</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Primary IP Address</th>
+    <th>Primary Subnet Mask</th>
+    <th>MOP System ID</th>
+    <th>MOP xEnabled</th>
+    <th>Negotiation Auto</th>
+    <th>Shutdown</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for interface in hit.GigabitEthernet %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>GigabitEthernet</td>
+    <td>{{ interface.name }}</td>
+    <td>{{ interface.description }}</td>
+{%-             if interface.ip.address %}
+    <td>{{ interface.ip.address.primary.address }}</td>
+    <td>{{ interface.ip.address.primary.mask }}</td>
+{%-             elif interface.ip['no-address'] %}
+    <td>N/A</td>
+    <td>N/A</td>
+{%-             endif %}
+    <td>{{ interface.mop.sysid }}</td>
+    <td>{{ interface.mop.xenabled }}</td>
+{%-             if interface.negotiation.auto %}
+    <td>{{ interface.negotiation.auto }}</td>
+{%-             else %}
+    <td>N/A</td>
+    {%- endif %}
+    <td>N/A</td>
+  </tr>
+{%-         endfor %}
+{%-         for interface in hit.Loopback %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>Loopback</td>
+    <td>{{ interface.name }}</td>
+    <td>{{ interface.description }}</td>
+{%-             if interface.ip.address %}
+    <td>{{ interface.ip.address.primary.address }}</td>
+    <td>{{ interface.ip.address.primary.mask }}</td>
+{%-             elif interface.ip['no-address'] %}
+    <td>N/A</td>
+    <td>N/A</td>
+{%-             endif %}
+    <td>N/A</td>
+    <td>N/A</td>
+    <td>N/A</td>
+{%-             if interface.shutdown %}
+    <td>{{ interface.shutdown }}</td>
+{%-             else %}
+    <td>N/A</td>
+{%-             endif %}
+  </tr>
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_ip" %}
+<h1>Device Cisco IOS IP</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Domain Name</th>
+    <th>Domain Lookup</th>
+    <th>Forward Protocol ND</th>
+    <th>HTTP Secure Server</th>
+    <th>HTTP Server</th>
+    <th>SSH Server Algorithm Authentication</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit.domain.name }}</td>
+    <td>{{ hit.domain['lookup-conf'].lookup }}</td>
+    <td>{{ hit['forward-protocol'].nd }}</td>
+    <td>{{ hit.http['secure-server'] }}</td>
+    <td>{{ hit.http.server }}</td>
+    <td>{{ hit.ssh.server.algorithm.authentication }}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_ip_route_vrf" %}
+<h1>Device Cisco IOS IP Route VRF</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>VRF</th>
+    <th>Forwarding Address</th>
+    <th>Subnet Mask</th>
+    <th>Prefix</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for vrf in hit.route.vrf %}
+{%-             for route in vrf['ip-route-forwarding-list'] %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ vrf.name }}</td>
+    <td>{{ route['forwarding-address'] }}</td>
+    <td>{{ route.mask }}</td>
+    <td>{{ route.prefix }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_line_console" %}
+<h1>Device Cisco IOS Line Console</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Exec Timeout Minutes</th>
+    <th>First</th>
+    <th>Password Secret</th>
+    <th>Stopbits</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for console in hit.console %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ console['exec-timeout'].minutes }}</td>
+    <td>{{ console.first }}</td>
+    <td>{{ console.password.secret }}</td>
+    <td>{{ console.stopbits }}</td>
+  </tr>
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_line_vty" %}
+<h1>Device Cisco IOS Line VTY</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Exec Timeout Minutes</th>
+    <th>First</th>
+    <th>Last</th>
+    <th>Login Local</th>
+    <th>Password Secret</th>
+    <th>Transport Input</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+{%-         for vty in hit.vty %}
+{%-             for input in vty.transport.input %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ vty['exec-timeout'].minutes }}</td>
+    <td>{{ vty.first }}</td>
+    <td>{{ vty.last }}</td>
+    <td>{{ vty.login.local }}</td>
+    <td>{{ vty.password.secret }}</td>
+    <td>{{ input }}</td>
+  </tr>
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_logging" %}
+<h1>Device Cisco IOS Logging</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>Buffered Severity Level</th>
+    <th>Monitor Severity Level</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit.buffered['severity-level']}}</td>
+    <td>{{ hit.monitor['severity-level']}}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
+{%- elif api == "cisco_ios_login" %}
+<h1>Device Cisco IOS Login</h1>
+<table id = "datatable">
+<thead>
+  <tr>
+    <th>Device Name</th>
+    <th>On Success Log</th>
+  </tr>
+</thead>  
+<tbody>
+{%-     for hit in data_to_template %}
+  <tr>
+    <td>{{ hit.device_name }}</td>
+    <td>{{ hit['on-success'].log }}</td>
+  </tr>
+{%-     endfor %}
+</tbody>
+</table>
 {%- endif %}
 {%- include 'datatable_footer.j2' %}

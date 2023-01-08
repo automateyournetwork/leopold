@@ -96,4 +96,97 @@
 {%-             endfor %}
 {%-         endfor %}
 {%-     endfor %}
+{%- elif api == "device_capability" %}Device Name,Module,Revision,URI
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['capability']%}
+{%-             for capability in device['capability'] %}
+{{ device.name }},{{ capability.module | default("N/A") }},{{ capability.revision | default("N/A") }},{{ capability.uri }}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+{%- elif api == "device_module" %}Device Name,Module Name,Revision
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['module']%}
+{%-             for module in device['module'] %}
+{{ device.name }},{{ module.name }},{{ module.revision }}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_call_home" %}Device Name,Contact Email Address,Profile Name,Active,Transport Method Email,Transport Method HTTP,Smart Licensing Data
+{%-     for hit in data_to_template %}
+{%-         for profile in hit.profile %}
+{%-             for http in profile.destination['transport-method'].http %}
+{{ hit.device_name }},{{ hit['contact-email-addr'] }},{{ profile.name }},{{ profile.active }},{{ profile.destination['transport-method'].email }},{{ http }},{{ profile.reporting['smart-licensing-data'] }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_crypto_pki_certificates" %}Device Name,Certificate Name,Certificate,Certificate Type,Certificate Serial
+{%-     for hit in data_to_template %}
+{%-         for chain in hit.pki.certificate.chain %}
+{%-             for cert in chain.certificate %}
+{{ hit.device_name }},{{ chain.name }},{{ cert.cert | replace("\r\n","") }},{{ cert['cert-type'] }},{{ cert.serial }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_crypto_pki_trust_points" %}Device Name,ID,Enrollment Type,Enrollment,Revocation Check,RSA Key Pair Key Label,Subject Name
+{%-     for hit in data_to_template %}
+{%-         for trustpoint in hit.pki.trustpoint %}
+{{ hit.device_name }},{{ trustpoint.id }},{%- if trustpoint.enrollment.pkcs12 %}PKCS12,{{ trustpoint.enrollment.pkcs12 | replace(","," ") }}{%- elif trustpoint.enrollment.selfsigned %}Self Signed,{{ trustpoint.enrollment.selfsigned | replace(","," ") }}{%- endif %},{{ trustpoint['revocation-check'] | replace(","," ") }},{%- if trustpoint.rsakeypair %}{{ trustpoint.rsakeypair['key-label'] }}{%- else %}N/A{%- endif %},{%- if trustpoint['subject-name'] %}{{ trustpoint['subject-name'] }}{%- else %}N/A{%- endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_diagnostic" %}Device Name,Bootup Level
+{%-     for hit in data_to_template %}
+{{ hit.device_name }},{{ hit.bootup.level }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_enable_password" %}Device Name,Password Secret
+{%-     for hit in data_to_template %}
+{{ hit.device_name }},{{ hit.password.secret }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_hostname" %}Hostname
+{%-     for hostname in data_to_template %}
+{{ hostname }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_interface" %}Device Name,Type,Name,Description,Primary IP Address,Primary Subnet Mask,MOP System ID,MOP xEnabled,Negotiation Auto,Shutdown
+{%-     for hit in data_to_template %}
+{%-         for interface in hit.GigabitEthernet %}
+{{ hit.device_name }},GigabitEthernet,{{ interface.name }},{{ interface.description }},{%- if interface.ip.address %}{{ interface.ip.address.primary.address }},{{ interface.ip.address.primary.mask }},{%- elif interface.ip['no-address'] %}N/A,N/A,{%- endif %}{{ interface.mop.sysid }},{{ interface.mop.xenabled }},{%- if interface.negotiation.auto %}{{ interface.negotiation.auto }},{%- else %}N/A,{%- endif %}N/A
+{%-         endfor %}
+{%-         for interface in hit.Loopback %}
+{{ hit.device_name }},Loopback,{{ interface.name }},{{ interface.description }},{%- if interface.ip.address %}{{ interface.ip.address.primary.address }},{{ interface.ip.address.primary.mask }},{%- elif interface.ip['no-address'] %}N/A,N/A,{%- endif %}N/A,N/A,N/A,{%- if interface.shutdown %}{{ interface.shutdown | replace(","," ") }}{%- else %}N/A{%- endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_ip" %}Device Name,Domain Name,Domain Lookup,Forward Protocol ND,HTTP Secure Server,HTTP Server,SSH Server Algorithm Authentication
+{%-     for hit in data_to_template %}
+{{ hit.device_name }},{{ hit.domain.name }},{{ hit.domain['lookup-conf'].lookup }},{{ hit['forward-protocol'].nd }},{{ hit.http['secure-server'] }},{{ hit.http.server }},{{ hit.ssh.server.algorithm.authentication }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_ip_route_vrf" %}Device Name,VRF,Forwarding Address,Subnet Mask,Prefix
+{%-     for hit in data_to_template %}
+{%-         for vrf in hit.route.vrf %}
+{%-             for route in vrf['ip-route-forwarding-list'] %}
+{{ hit.device_name }},{{ vrf.name }},{{ route['forwarding-address'] }},{{ route.mask }},{{ route.prefix }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_line_console" %}Device Name,Exec Timeout Minutes,First,Password Secret,Stopbits
+{%-     for hit in data_to_template %}
+{%-         for console in hit.console %}
+{{ hit.device_name }},{{ console['exec-timeout'].minutes }},{{ console.first }},{{ console.password.secret }},{{ console.stopbits }}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_line_vty" %}Device Name,Exec Timeout Minutes,First,Last,Login Local,Password Secret,Transport Input
+{%-     for hit in data_to_template %}
+{%-         for vty in hit.vty %}
+{%-             for input in vty.transport.input %}
+{{ hit.device_name }},{{ vty['exec-timeout'].minutes }},{{ vty.first }},{{ vty.last }},{{ vty.login.local }},{{ vty.password.secret }},{{ input }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_logging" %}Device Name,Buffered Severity Level,Monitor Severity Level
+{%-     for hit in data_to_template %}
+{{ hit.device_name }},{{ hit.buffered['severity-level']}},{{ hit.monitor['severity-level']}}
+{%-     endfor %}
+{%- elif api == "cisco_ios_login" %}Device Name,On Success Log
+{%-     for hit in data_to_template %}
+{{ hit.device_name }},{{ hit['on-success'].log }}
+{%-     endfor %}
 {%- endif %}

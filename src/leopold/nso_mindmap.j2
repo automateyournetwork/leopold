@@ -213,4 +213,180 @@
 {%-             endfor %}
 {%-         endfor %}
 {%-     endfor %}
+{%- elif api == "device_capability" %}
+# Device Capabilities
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['capability']%}
+## Name: {{ device.name }}
+### Capabilities
+{%-             for capability in device['capability'] %}
+#### Module: {{ capability.module | default("N/A") }}
+##### Revision: {{ capability.revision | default("N/A") }}
+##### URI: {{ capability.uri }}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+{%- elif api == "device_module" %}
+# Device Modules
+{%-     for device in data_to_template['tailf-ncs:device'] %}
+{%-         if device['module']%}
+## Device Name: {{ device.name }}
+### Modules
+{%-             for module in device['module'] %}
+#### Name: {{ module.name }}
+##### Revision: {{ module.revision }}
+{%-             endfor %}
+{%-         endif %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_call_home" %}
+# Device Cisco IOS Call Home
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Contact Email Address: {{ hit['contact-email-addr'] }}
+{%-         for profile in hit.profile %}
+### Profile Name: {{ profile.name }}
+#### Active: {{ profile.active }}
+#### Smart Licensing Data: {{ profile.reporting['smart-licensing-data'] }}
+#### Transport Method
+##### Email: {{ profile.destination['transport-method'].email }}
+##### HTTP:
+{%-             for http in profile.destination['transport-method'].http %}
+###### {{ http }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_crypto_pki_certificates" %}
+# Device Cisco IOS Crypto PKI Certificates
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for chain in hit.pki.certificate.chain %}
+### Chain Name: {{ chain.name }}
+#### Certificate
+{%-             for cert in chain.certificate %}
+##### {{ cert.cert | replace("\r\n","\n##### ")}}
+#### Certificate Type: {{ cert['cert-type'] }}
+#### Certificate Serial: {{ cert.serial }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_diagnostic" %}
+# Device Cisco IOS Diagnostic
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Bootup Level: {{ hit.bootup.level }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_enable_password" %}
+# Device Cisco IOS Enable Password Secrets
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Password Secret: {{ hit.password.secret }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_hostname" %}
+# Device Cisco IOS Hostname
+{%-     for hostname in data_to_template %}
+## {{ hostname }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_interface" %}
+# Device Cisco IOS Interface
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### GigabitEthernet
+{%-         for interface in hit.GigabitEthernet %}
+#### Name: {{ interface.name }}
+##### Description {{ interface.description }}
+{%-             if interface.ip.address %}
+##### IP Address
+###### Primary Address: {{ interface.ip.address.primary.address }}
+###### Primary Mask: {{ interface.ip.address.primary.mask }}
+{%-             endif %}
+##### MOP
+###### System ID: {{ interface.mop.sysid }}
+###### xEnabled: {{ interface.mop.xenabled }}
+{%-             if interface.negotiation.auto %}
+##### Negotiation Auto: {{ interface.negotiation.auto }}
+{%-             else %}
+    {%- endif %}
+{%-         endfor %}
+### Loopback
+{%-         for interface in hit.Loopback %}
+#### Name: {{ interface.name }}
+##### Description: {{ interface.description }}
+{%-             if interface.ip.address %}
+##### IP Address
+###### Primary Address: {{ interface.ip.address.primary.address }}
+###### Primary Subnet Mask: {{ interface.ip.address.primary.mask }}
+{%-             endif %}
+{%-             if interface.shutdown %}
+##### Shutdown: {{ interface.shutdown }}
+{%-             endif %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_ip" %}
+# Device Cisco IOS IP
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Domain
+#### Name: {{ hit.domain.name }}
+#### Look Up: {{ hit.domain['lookup-conf'].lookup }}
+### Forward Protocol ND: {{ hit['forward-protocol'].nd }}
+### HTTP
+#### Secure Server: {{ hit.http['secure-server'] }}
+#### Server: {{ hit.http.server }}
+### SSH Server Algorithm Authentication: {{ hit.ssh.server.algorithm.authentication }}
+{%-     endfor %}
+{%- elif api == "cisco_ios_ip_route_vrf" %}
+# Device Cisco IOS IP Route VRF
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for vrf in hit.route.vrf %}
+### VRF Name: {{ vrf.name }}
+#### Route
+{%-             for route in vrf['ip-route-forwarding-list'] %}
+##### Forwarding Address: {{ route['forwarding-address'] }}
+##### Prefix Mask: {{ route.mask }}
+##### Prefix: {{ route.prefix }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_line_console" %}
+# Device Cisco IOS Line Console
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+{%-         for console in hit.console %}
+### Exec Timeout Minutes: {{ console['exec-timeout'].minutes }}
+### First: {{ console.first }}
+### Secret: {{ console.password.secret }}
+### Stopbits: {{ console.stopbits }}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_line_vty" %}
+# Device Cisco IOS Line VTY
+{%-     for hit in data_to_template %}
+## Name: {{ hit.device_name }}
+{%-         for vty in hit.vty %}
+### Exec Timeout Minutes: {{ vty['exec-timeout'].minutes }}
+### First: {{ vty.first }}
+### Last: {{ vty.last }}
+### Local: {{ vty.login.local }}
+### Secret: {{ vty.password.secret }}
+### Input
+{%-             for input in vty.transport.input %}
+#### {{ input }}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- elif api == "cisco_ios_logging" %}
+# Device Cisco IOS Logging
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### Severity Levels:
+#### Buffered: {{ hit.buffered['severity-level']}}
+#### Monitor: {{ hit.monitor['severity-level']}}
+{%-     endfor %}
+{%- elif api == "cisco_ios_login" %}
+# Device Cisco IOS Login
+{%-     for hit in data_to_template %}
+## Device Name: {{ hit.device_name }}
+### On Success Log: {{ hit['on-success'].log }}
+{%-     endfor %}
 {%- endif %}
